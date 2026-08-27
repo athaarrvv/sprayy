@@ -1,0 +1,12 @@
+R_DEF: Internal format may change without notice
+local
+raw spray1
+raw spray2
+raw spray3
+raw spray4
+raw spray5
+raw spray6
+raw spray7
+raw spray8
+string app_name
+style AppTheme
