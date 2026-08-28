@@ -51,7 +51,7 @@ class SprayNotificationListener : NotificationListenerService() {
             setOnCompletionListener { it.release() }
             start()
         }
-    }
+    
 
     override fun onDestroy() { player?.release(); player = null; super.onDestroy() }
 }
