@@ -42,16 +42,60 @@ class SprayNotificationListener : NotificationListenerService() {
         if (!key.endsWith("|")) counts.remove(key)
     }
 
-    private fun playSpray(number: Int) {
+private fun playSpray(number: Int) {
         val resId = resources.getIdentifier("spray$number", "raw", packageName)
-        if (resId == 0) return
-        player?.release()
-        player = MediaPlayer.create(this, resId)?.apply {
-            setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
-            setOnCompletionListener { it.release() }
-            start()
-        }
-    
+
+            if (resId == 0) return
+
+                player?.release()
+                    player = null
+
+                        try {
+                                    val afd = resources.openRawResourceFd(resId) ?: return
+
+                                            val mp = MediaPlayer()
+
+                                                    // Route spray sound through Android's Notification audio stream
+                                                            mp.setAudioAttributes(
+                                                                            AudioAttributes.Builder()
+                                                                                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                                                                                                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                                                                                                            .build()
+                                                            )
+
+                                                                    mp.setDataSource(
+                                                                                    afd.fileDescriptor,
+                                                                                                afd.startOffset,
+                                                                                                            afd.length
+                                                                    )
+
+                                                                            afd.close()
+
+                                                                                    mp.setOnCompletionListener {
+                                                                                                    it.release()
+
+                                                                                                                if (player === it) {
+                                                                                                                                    player = null
+                                                                                                                }
+                                                                                    }
+
+                                                                                            mp.prepare()
+                                                                                                    player = mp
+                                                                                                            mp.start()
+
+                        } catch (e: Exception) {
+                                    e.printStackTrace()
+                                            player = null
+                        }
+}
+                        }
+                                                                                                                }
+                                                                                    }
+                                                                    )
+                                                            )
+                        }
+}
+
 
     override fun onDestroy() { player?.release(); player = null; super.onDestroy() }
 }
